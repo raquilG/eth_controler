@@ -1,23 +1,39 @@
 version: 2.1
 
 jobs:
-  run_the_script:
+  test-and-lint:
     docker:
       - image: cimg/python:3.10.1
     steps:
       - checkout
       - run:
-        name: je fais un test
-        command: |
-          . env/bin/activate
-          pip freeze -r requirement.txt
+          name: install dependencies on env
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: linter
+          command: |
+            . venv/bin/activate
+            flake8
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            python main.py
 
-
+    
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  main:
+  main: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - run_the_script
-        filters:
-          branches:
-            only:
-              - master
+      - test-and-lint
+          requires:
+            - test-and-lint
+          filters:
+            branches:
+              only:
+                - master
