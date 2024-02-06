@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  run_the_script:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - run:
+        name: je fais un test
+        command: |
+          . env/bin/activate
+          pip freeze -r requirement.txt
+
+
+workflows:
+  main:
+    jobs:
+      - run_the_script
+        filters:
+          branches:
+            only:
+              - master
